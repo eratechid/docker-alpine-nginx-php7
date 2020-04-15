@@ -6,7 +6,7 @@ Usage
 
 Pull/Clone source :
 
-    git clone https://github.com/pindank/docker-alpine-nginx-php7.git
+    git clone https://github.com/eratechid/docker-alpine-nginx-php7.git
 
 Built docker image :
 
