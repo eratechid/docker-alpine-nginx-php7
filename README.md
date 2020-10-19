@@ -1,4 +1,4 @@
-Docker PHP-FPM 7.1 & Nginx 1.12 on Alpine Linux
+Docker PHP-FPM 7.2 & Nginx 1.14 on Alpine Linux
 ==============================================
 
 Usage
@@ -12,4 +12,3 @@ Built docker image :
 
     docker build -t dokcer-alpine-nginx-php7 .
     
-Start the image :
