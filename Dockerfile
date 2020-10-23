@@ -3,6 +3,8 @@ LABEL Maintainer="eratechid" \
       Description="Lightweight container with Nginx 1.14 & PHP-FPM 7.2 based on Alpine Linux."
 
 ENV TZ "Asia/Jakarta"
+ARG NEW_RELIC_LICENSE_KEY
+ARG APP_NAME
 
 # Install packages
 RUN apk update && \
@@ -28,6 +30,14 @@ COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 COPY config/php.ini /etc/php7/conf.d/zzz_custom.ini
 
+# Configure New Relic
+COPY config/newrelic-20170718.so /usr/lib/php7/modules/newrelic.so
+COPY config/newrelic-daemon.x64 /usr/bin/newrelic-daemon
+COPY config/newrelic.ini.template /etc/php7/conf.d/newrelic.ini
+RUN sed -i -e "s/REPLACE_WITH_REAL_KEY/${NEW_RELIC_LICENSE_KEY}/" /etc/php7/conf.d/newrelic.ini
+RUN sed -i -e "s/REPLACE_WITH_REAL_APP/${APP_NAME}/" /etc/php7/conf.d/newrelic.ini
+RUN mkdir -p  /var/log/newrelic
+
 # Configure supervisord
 COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -35,7 +45,8 @@ COPY config/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chown -R nobody.nobody /run && \
   chown -R nobody.nobody /var/lib/nginx && \
   chown -R nobody.nobody /var/tmp/nginx && \
-  chown -R nobody.nobody /var/log/nginx
+  chown -R nobody.nobody /var/log/nginx && \
+  chown -R nobody.nobody /var/log/newrelic
 
 # Setup document root
 RUN mkdir -p /var/www/html
@@ -51,7 +62,8 @@ WORKDIR /var/www/html
 EXPOSE 8080
 
 # Let supervisord start nginx & php-fpm
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf", "&& newrelic-daemon start"]
+CMD /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
 
 # Configure a healthcheck to validate that everything is up&running
 HEALTHCHECK --timeout=10s CMD curl --silent --fail http://127.0.0.1:8080/fpm-ping
