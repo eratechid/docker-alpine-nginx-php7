@@ -10,5 +10,8 @@ Pull/Clone source :
 
 Built docker image :
 
-    docker build -t dokcer-alpine-nginx-php7 .
+    docker build -t docker-alpine-nginx-php7 --build-arg NEW_RELIC_LICENSE_KEY=XXX --build-arg APP_NAME=MYAPPS .
     
+Run docker image :
+
+    docker run docker-alpine-nginx-php7
