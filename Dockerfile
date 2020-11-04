@@ -57,6 +57,11 @@ RUN mkdir -p /var/www/html
 # Add application
 WORKDIR /var/www/html
 #COPY --chown=nobody src/ /var/www/html/
+COPY src/ /var/www/html/
+RUN composer install && \
+    composer update
+RUN npm install && \
+    npm run prod
 
 # Expose the port nginx is reachable on
 EXPOSE 8080
